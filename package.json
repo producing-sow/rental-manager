@@ -1,0 +1,13 @@
+{
+  "name": "rental-manager-ui-tests",
+  "private": true,
+  "scripts": {
+    "test:ui": "node tests/ui_smoke.cjs",
+    "test:ui:auto": "node tests/ui_auto_readings.cjs",
+    "test:ui:negative": "node tests/ui_negative_rent.cjs",
+    "test:ui:ledger": "node tests/ui_ledger_costs.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
+  }
+}
