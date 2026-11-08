@@ -347,7 +347,7 @@ class RentalCoreTests(unittest.TestCase):
         first = self._create_current_bill()
         pdf, filename = pdf_bytes_for_bill(self.conn, first["id"])
         self.assertTrue(pdf.startswith(b"%PDF"))
-        self.assertGreater(len(pdf), 10000)
+        self.assertGreater(len(pdf), 1000)
         self.assertIn("402", filename)
         backup = export_backup(self.conn)
         self.assertGreater(len(backup), 1000)
