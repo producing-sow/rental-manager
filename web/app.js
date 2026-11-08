@@ -245,16 +245,23 @@ function api(path, options = {}) {
   if (request.body && typeof request.body !== "string" && !(request.body instanceof Blob)) {
     request.body = JSON.stringify(request.body);
   }
-  return fetch(path, request).then(async (response) => {
-    const contentType = response.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) {
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || `请求失败 (${response.status})`);
-      return data;
-    }
-    if (!response.ok) throw new Error(`请求失败 (${response.status})`);
-    return response;
-  });
+  return fetch(path, request)
+    .then(async (response) => {
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || `请求失败 (${response.status})`);
+        return data;
+      }
+      if (!response.ok) throw new Error(`请求失败 (${response.status})`);
+      return response;
+    })
+    .catch((error) => {
+      if (error instanceof TypeError) {
+        throw new Error("无法连接本地服务，请保持“启动收租管理”命令行窗口开启后重试。");
+      }
+      throw error;
+    });
 }
 
 function toast(message, type = "success") {
