@@ -9,6 +9,7 @@ from typing import Any
 from reportlab.lib.colors import Color, HexColor, white
 from reportlab.lib.pagesizes import A4, A5, landscape
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
@@ -30,7 +31,7 @@ _FONTS_READY = False
 
 
 def _register_fonts() -> None:
-    global _FONTS_READY
+    global _FONTS_READY, FONT_BODY, FONT_HEAD, FONT_BOLD
     if _FONTS_READY:
         return
 
@@ -44,13 +45,19 @@ def _register_fonts() -> None:
             Path("C:/Windows/Fonts/NotoSansSC-VF.ttf"),
         ],
     }
+    resolved = {}
     for font_name, paths in candidates.items():
         for path in paths:
             if path.exists():
                 pdfmetrics.registerFont(TTFont(font_name, str(path)))
+                resolved[font_name] = font_name
                 break
-        else:
-            raise RuntimeError(f"找不到可用中文字体：{font_name}")
+    if len(resolved) < len(candidates):
+        fallback_name = "STSong-Light"
+        pdfmetrics.registerFont(UnicodeCIDFont(fallback_name))
+        FONT_BODY = fallback_name
+        FONT_HEAD = fallback_name
+        FONT_BOLD = fallback_name
     _FONTS_READY = True
 
 
@@ -135,10 +142,11 @@ def _draw_text(
     y: float,
     text: str,
     size: float = 9,
-    font: str = FONT_BODY,
+    font: str | None = None,
     color: Color = INK,
     align: str = "left",
 ) -> None:
+    font = font or FONT_BODY
     c.setFont(font, size)
     c.setFillColor(color)
     if align == "right":
